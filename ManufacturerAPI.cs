@@ -22,12 +22,12 @@ namespace ManufacturerFUnction
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             string userRequest = req.Query["requestBody"];
-            string responseMessage = "ffffffffff";
+            string responseMessage = "";
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             userRequest = userRequest ?? data?.requestBody;
 
-            /*if(!string.IsNullOrEmpty(userRequest))
+            if(!string.IsNullOrEmpty(userRequest))
             {
                 var str = Environment.GetEnvironmentVariable("sqldb_connection");
                 using (SqlConnection conn = new SqlConnection(str))
@@ -85,9 +85,9 @@ namespace ManufacturerFUnction
             else
             {
                 return new NotFoundObjectResult(userRequest);
-            }*/
+            }
             // Get the connection string from app settings and use it to create a connection.
-           return new OkObjectResult(responseMessage);
+           
         }
     }
 }
