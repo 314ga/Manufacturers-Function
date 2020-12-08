@@ -29,7 +29,7 @@ namespace ManufacturerFUnction
 
             if(!string.IsNullOrEmpty(userRequest))
             {
-                var str = Environment.GetEnvironmentVariable("sqldb_connection");
+                var str = Environment.GetEnvironmentVariable("sqljdbc_connection");
                 using (SqlConnection conn = new SqlConnection(str))
                 {
                     var text = "";
