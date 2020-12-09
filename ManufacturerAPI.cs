@@ -19,7 +19,7 @@ namespace ManufacturerFUnction
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("C# HTTP API requests for manufacturer");
 
             string userRequest = req.Query["requestBody"];
             string responseMessage = "";
@@ -36,19 +36,33 @@ namespace ManufacturerFUnction
                     conn.Open();
                     switch(userRequest)
                     {
-                        case "manufacturers":
+                        case "planes-per-manufacturer":
                         {
-                            text = "SELECT * from weather where origin = 'JFK' FOR JSON PATH; ";
+                            text = "SELECT * FROM(SELECT manufacturer, count(manufacturer) AS plane_count FROM dbo.planes GROUP by manufacturer) " +
+                                "AS result_table WHERE plane_count> 200 FOR JSON PATH";
                             break;
                         }
-                        case "manufacturers-flights":
+                        case "flights-per-manufacturer":
                         {
-                             text = "SELECT * from weather where origin = 'JFK' FOR JSON PATH; ";
+                             text = "DECLARE @Looper INT = 1, @Manufacturers INT, @ManufacturerName NVARCHAR(100), @ManufacturerNames NVARCHAR(300), " +
+                                "@ManufacturerFlights NVARCHAR(100) SELECT @Manufacturers = count(*) FROM(SELECT * FROM(SELECT manufacturer, count(manufacturer) AS plane_count " +
+                                "FROM dbo.planes GROUP by manufacturer) AS result_table WHERE plane_count > 200) as manufact; " +
+                                "WHILE(@Looper <= @Manufacturers) BEGIN WITH cte_customers AS(SELECT ROW_NUMBER() OVER(ORDER BY manufacturer ) row_num, manufacturer " +
+                                "FROM(SELECT * FROM(SELECT manufacturer, count(manufacturer) AS plane_count FROM dbo.planes GROUP by manufacturer) AS result_table WHERE plane_count > 200) as manufact) " +
+                                "SELECT @ManufacturerName = manufacturer FROM cte_customers WHERE row_num = @Looper;" +
+                                "SELECT @ManufacturerFlights = count(*) FROM(SELECT flights.id, planes.manufacturer FROM dbo.flights " +
+                                "INNER JOIN planes ON flights.tailnum = planes.tailnum AND planes.manufacturer = @ManufacturerName) as s; " +
+                                "SET @Looper = @Looper + 1 IF (@ManufacturerNames IS NULL or @ManufacturerNames = '') " +
+                                "SELECT @ManufacturerNames = CONCAT('[{\"manufacturer\":\"',@ManufacturerName,'\",\"flights\":',@ManufacturerFlights, '},') " +  
+                                "ELSE SELECT @ManufacturerNames = CONCAT(@ManufacturerNames,'{\"manufacturer\":\"',@ManufacturerName,'\",\"flights\":',@ManufacturerFlights, '},') " +
+                                "END SELECT @ManufacturerNames = CONCAT(@ManufacturerNames,']') SELECT @ManufacturerNames AS company; ";
                             break;
                         }
-                        case "airbus-models":
+                        case "airbus-per-manufaturer":
                         {
-                            text = "SELECT * from weather where origin = 'JFK' FOR JSON PATH; ";
+                            text = "SELECT manufacturer AS model, count(*) as airbus_model FROM dbo.planes " +
+                                 "WHERE  manufacturer = 'AIRBUS' GROUP BY manufacturer UNION ALL SELECT manufacturer AS model, " +
+                                 "count(*) as airbus_model FROM dbo.planes WHERE  manufacturer = 'AIRBUS INDUSTRIE' GROUP BY manufacturer FOR JSON PATH; ";
                             break;
                         }
                         default:
