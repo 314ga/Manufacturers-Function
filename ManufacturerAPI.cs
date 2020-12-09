@@ -55,7 +55,8 @@ namespace ManufacturerFUnction
                                 "SET @Looper = @Looper + 1 IF (@ManufacturerNames IS NULL or @ManufacturerNames = '') " +
                                 "SELECT @ManufacturerNames = CONCAT('[{\"manufacturer\":\"',@ManufacturerName,'\",\"flights\":',@ManufacturerFlights, '},') " +  
                                 "ELSE SELECT @ManufacturerNames = CONCAT(@ManufacturerNames,'{\"manufacturer\":\"',@ManufacturerName,'\",\"flights\":',@ManufacturerFlights, '},') " +
-                                "END SELECT @ManufacturerNames = CONCAT(@ManufacturerNames,']') SELECT @ManufacturerNames AS company; ";
+                                "END SELECT @ManufacturerNames = substring(@ManufacturerNames, 1, (len(@ManufacturerNames) - 1)) SELECT @ManufacturerNames = CONCAT(@ManufacturerNames"+
+                                ",']') SELECT @ManufacturerNames AS company; ";
                             break;
                         }
                         case "airbus-per-manufaturer":
