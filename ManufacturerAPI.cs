@@ -94,6 +94,8 @@ namespace ManufacturerFUnction
                     }
                     
                 }
+                if(responseMessage.EndsWith(","))
+                    responseMessage.Substring(0, responseMessage.Length - 1);
                 return new OkObjectResult(responseMessage);
             }
             else
