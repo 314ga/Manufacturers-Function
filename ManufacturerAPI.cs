@@ -81,7 +81,7 @@ namespace ManufacturerFUnction
                             while (reader.Read())
                             {
                                 IDataRecord result = (IDataRecord)reader;
-                                responseMessage += String.Format("{0},", result[0]);
+                                responseMessage += String.Format("{0}", result[0]);
                             }
                             // Call Close when done reading.
                             reader.Close();
@@ -94,8 +94,6 @@ namespace ManufacturerFUnction
                     }
                     
                 }
-                if(responseMessage.EndsWith(","))
-                    responseMessage.Substring(0, responseMessage.Length - 1);
                 return new OkObjectResult(responseMessage);
             }
             else
